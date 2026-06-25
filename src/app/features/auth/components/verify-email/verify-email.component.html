@@ -1,0 +1,59 @@
+<div class="auth-container animate-fade-in">
+  <div class="glass-card auth-card text-center">
+    <div class="auth-header">
+      <div class="logo-circle">
+        <span class="icon">mark_email_read</span>
+      </div>
+      <h1>Xác thực tài khoản</h1>
+      <p>Kích hoạt email học tiếng Nhật của bạn</p>
+    </div>
+
+    @if (!token) {
+      <div class="alert-banner alert-error text-left">
+        <span class="alert-icon">error</span>
+        <div class="alert-content">
+          <div class="alert-title">Mã xác thực thiếu</div>
+          <div class="alert-desc">Yêu cầu xác thực không hợp lệ (thiếu token).</div>
+        </div>
+      </div>
+      <button routerLink="/login" class="btn btn-secondary w-full mt-4">
+        Quay lại đăng nhập
+      </button>
+    } @else {
+      @if (verifyMutation.isPending()) {
+        <div class="loading-state">
+          <span class="spinner accent-spinner"></span>
+          <p class="mt-4">Đang xác thực tài khoản của bạn...</p>
+        </div>
+      } @else if (verifyMutation.isSuccess()) {
+        <div class="alert-banner alert-success text-left mb-6">
+          <span class="alert-icon">check_circle</span>
+          <div class="alert-content">
+            <div class="alert-title">Thành công!</div>
+            <div class="alert-desc">
+              {{ verificationData?.message || 'Địa chỉ email đã được xác thực thành công.' }}
+            </div>
+          </div>
+        </div>
+        
+        <p class="status-tip">Tài khoản của bạn đã sẵn sàng cho mọi tính năng của StudyJapanese.</p>
+        
+        <button routerLink="/dashboard" class="btn btn-primary w-full mt-4">
+          Vào bảng điều khiển
+        </button>
+      } @else if (verifyMutation.error()) {
+        <div class="alert-banner alert-error text-left mb-6">
+          <span class="alert-icon">error</span>
+          <div class="alert-content">
+            <div class="alert-title">Xác thực thất bại</div>
+            <div class="alert-desc">{{ getErrorMessage() }}</div>
+          </div>
+        </div>
+        
+        <button routerLink="/dashboard" class="btn btn-secondary w-full mt-4">
+          Vào trang cá nhân
+        </button>
+      }
+    }
+  </div>
+</div>

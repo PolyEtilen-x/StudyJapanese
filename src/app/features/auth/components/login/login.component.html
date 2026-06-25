@@ -1,0 +1,81 @@
+<div class="auth-container animate-fade-in">
+  <div class="glass-card auth-card">
+    <div class="auth-header">
+      <div class="logo-circle">
+        <span class="icon">menu_book</span>
+      </div>
+      <h1>StudyJapanese</h1>
+      <p>Học tiếng Nhật thông minh & hiệu quả</p>
+    </div>
+
+    @if (loginMutation.error()) {
+      <div class="alert-banner alert-error">
+        <span class="alert-icon">error</span>
+        <div class="alert-content">
+          <div class="alert-title">Đăng nhập thất bại</div>
+          <div class="alert-desc">{{ getErrorMessage() }}</div>
+        </div>
+      </div>
+    }
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label class="form-label" for="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          class="form-input"
+          placeholder="ten.ban@example.com"
+          formControlName="email"
+        />
+        @if (emailErrors) {
+          <div class="form-error">
+            @if (loginForm.get('email')?.hasError('required')) {
+              Email không được để trống
+            } @else if (loginForm.get('email')?.hasError('email')) {
+              Địa chỉ email không hợp lệ
+            }
+          </div>
+        }
+      </div>
+
+      <div class="form-group">
+        <div class="password-label-row">
+          <label class="form-label" for="password">Mật khẩu</label>
+          <a routerLink="/forgot-password" class="forgot-link">Quên mật khẩu?</a>
+        </div>
+        <input
+          id="password"
+          type="password"
+          class="form-input"
+          placeholder="••••••••"
+          formControlName="password"
+        />
+        @if (passwordErrors) {
+          <div class="form-error">
+            @if (loginForm.get('password')?.hasError('required')) {
+              Mật khẩu không được để trống
+            }
+          </div>
+        }
+      </div>
+
+      <button
+        type="submit"
+        class="btn btn-primary w-full mt-4"
+        [disabled]="loginForm.invalid || loginMutation.isPending()"
+      >
+        @if (loginMutation.isPending()) {
+          <span class="spinner"></span>
+          Đang xác thực...
+        } @else {
+          Đăng Nhập
+        }
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      Chưa có tài khoản? <a routerLink="/register">Đăng ký ngay</a>
+    </div>
+  </div>
+</div>

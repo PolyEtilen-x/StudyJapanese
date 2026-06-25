@@ -1,0 +1,116 @@
+<div class="auth-container animate-fade-in">
+  <div class="glass-card auth-card">
+    <div class="auth-header">
+      <div class="logo-circle">
+        <span class="icon">person_add</span>
+      </div>
+      <h1>Tạo tài khoản mới</h1>
+      <p>Bắt đầu hành trình chinh phục tiếng Nhật của bạn</p>
+    </div>
+
+    @if (registerMutation.error()) {
+      <div class="alert-banner alert-error">
+        <span class="alert-icon">error</span>
+        <div class="alert-content">
+          <div class="alert-title">Đăng ký thất bại</div>
+          <div class="alert-desc">{{ getErrorMessage() }}</div>
+        </div>
+      </div>
+    }
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label class="form-label" for="displayName">Họ và tên</label>
+        <input
+          id="displayName"
+          type="text"
+          class="form-input"
+          placeholder="Nguyễn Văn A"
+          formControlName="displayName"
+        />
+        @if (displayNameErrors) {
+          <div class="form-error">
+            Họ tên không được để trống
+          </div>
+        }
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          class="form-input"
+          placeholder="ten.ban@example.com"
+          formControlName="email"
+        />
+        @if (emailErrors) {
+          <div class="form-error">
+            @if (registerForm.get('email')?.hasError('required')) {
+              Email không được để trống
+            } @else if (registerForm.get('email')?.hasError('email')) {
+              Địa chỉ email không hợp lệ
+            }
+          </div>
+        }
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="password">Mật khẩu</label>
+        <input
+          id="password"
+          type="password"
+          class="form-input"
+          placeholder="Tối thiểu 6 ký tự"
+          formControlName="password"
+        />
+        @if (passwordErrors) {
+          <div class="form-error">
+            @if (registerForm.get('password')?.hasError('required')) {
+              Mật khẩu không được để trống
+            } @else if (registerForm.get('password')?.hasError('minlength')) {
+              Mật khẩu phải có tối thiểu 6 ký tự
+            }
+          </div>
+        }
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="confirmPassword">Nhập lại mật khẩu</label>
+        <input
+          id="confirmPassword"
+          type="password"
+          class="form-input"
+          placeholder="Xác nhận mật khẩu"
+          formControlName="confirmPassword"
+        />
+        @if (confirmPasswordErrors) {
+          <div class="form-error">
+            @if (registerForm.get('confirmPassword')?.hasError('required')) {
+              Vui lòng xác nhận mật khẩu
+            } @else if (registerForm.hasError('passwordMismatch')) {
+              Mật khẩu nhập lại không khớp
+            }
+          </div>
+        }
+      </div>
+
+      <button
+        type="submit"
+        class="btn btn-primary w-full mt-4"
+        [disabled]="registerForm.invalid || registerMutation.isPending()"
+      >
+        @if (registerMutation.isPending()) {
+          <span class="spinner"></span>
+          Đang đăng ký...
+        } @else {
+          Đăng Ký Tài Khoản
+        }
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      Đã có tài khoản? <a routerLink="/login">Đăng nhập</a>
+    </div>
+  </div>
+</div>

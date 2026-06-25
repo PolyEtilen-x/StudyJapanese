@@ -1,0 +1,122 @@
+<div class="dashboard-container animate-fade-in">
+  <!-- Top Navigation -->
+  <nav class="top-nav glass-card">
+    <div class="nav-brand">
+      <span class="icon logo-icon">menu_book</span>
+      <span class="brand-name">StudyJapanese</span>
+    </div>
+    <div class="nav-user">
+      <span class="user-greeting">Chào, <strong>{{ authService.currentUser()?.profile?.displayName || 'Học viên' }}</strong></span>
+      <button (click)="onLogout()" class="btn btn-secondary btn-sm" [disabled]="logoutMutation.isPending()">
+        @if (logoutMutation.isPending()) {
+          <span class="spinner btn-spinner"></span>
+        } @else {
+          <span class="icon">logout</span> Đăng xuất
+        }
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main Dashboard Content -->
+  <main class="dashboard-main">
+    
+    <!-- Email Verification Banner (Anti-slop custom alert) -->
+    @if (!authService.isEmailVerified()) {
+      <div class="verification-alert glass-card">
+        <div class="alert-header">
+          <span class="icon alert-iconwarning">warning</span>
+          <div class="alert-title-group">
+            <h3>Xác thực tài khoản chưa hoàn tất</h3>
+            <p>Vui lòng xác thực email để bảo mật tài khoản và truy cập đầy đủ tính năng.</p>
+          </div>
+        </div>
+        
+        <div class="alert-actions">
+          @if (requestVerificationMutation.isSuccess()) {
+            <div class="alert-banner alert-success">
+              <span class="alert-icon">check_circle</span>
+              <div class="alert-content">
+                <div class="alert-desc">Yêu cầu thành công! Chúng tôi đã gửi lại link kích hoạt mới vào email của bạn.</div>
+              </div>
+            </div>
+          } @else {
+            @if (requestVerificationMutation.error()) {
+              <div class="alert-banner alert-error">
+                <span class="alert-icon">error</span>
+                <div class="alert-content">
+                  <div class="alert-desc">Spam quá giới hạn hoặc lỗi hệ thống. Vui lòng thử lại sau.</div>
+                </div>
+              </div>
+            }
+            
+            <button 
+              (click)="onSendVerification()" 
+              class="btn btn-primary" 
+              [disabled]="requestVerificationMutation.isPending()"
+            >
+              @if (requestVerificationMutation.isPending()) {
+                <span class="spinner"></span> Đang gửi...
+              } @else {
+                <span class="icon">mail</span> Gửi lại email xác thực
+              }
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Dashboard Cards Grid -->
+    <div class="dashboard-grid">
+      <!-- Profile Card -->
+      <div class="glass-card stat-card profile-details-card">
+        <div class="card-header">
+          <span class="icon header-icon">account_circle</span>
+          <h2>Hồ sơ cá nhân</h2>
+        </div>
+        <div class="profile-info-list">
+          <div class="info-item">
+            <span class="info-label">Email đăng ký</span>
+            <span class="info-value">{{ authService.currentUser()?.email }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Vai trò hệ thống</span>
+            <span class="info-value role-badge">{{ authService.currentUser()?.role }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Xác thực Email</span>
+            <span class="info-value verified-badge" [class.verified]="authService.isEmailVerified()">
+              @if (authService.isEmailVerified()) {
+                <span class="icon text-success">verified</span> Đã xác thực
+              } @else {
+                <span class="icon text-warning">pending</span> Chưa xác thực
+              }
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Study Credits & Tier Card -->
+      <div class="glass-card stat-card credit-tier-card">
+        <div class="card-header">
+          <span class="icon header-icon">payments</span>
+          <h2>Gói cước & Tín dụng</h2>
+        </div>
+        <div class="tier-badge-container">
+          <div class="tier-glow-box" [class.standard-tier]="authService.currentUser()?.tier === 'STANDARD'">
+            <span class="tier-label">GÓI HIỆN TẠI</span>
+            <span class="tier-value">{{ authService.currentUser()?.tier }}</span>
+          </div>
+        </div>
+        
+        <div class="credits-info">
+          <div class="credits-label-row">
+            <span>Tín dụng AI học tập</span>
+            <strong class="credits-count">{{ authService.currentUser()?.profile?.credits ?? 0 }} Credits</strong>
+          </div>
+          <p class="credits-desc">Tín dụng dùng để chấm điểm phát âm AI, chấm bài viết tiếng Nhật, và trao đổi với Sensei AI.</p>
+        </div>
+      </div>
+    </div>
+    
+  </main>
+</div>
