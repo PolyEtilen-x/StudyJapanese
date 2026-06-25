@@ -1,0 +1,96 @@
+@if (roadmap) {
+  <div class="roadmap-summary-container glass-card mt-6">
+    <div class="roadmap-header">
+      <div class="roadmap-title-group">
+        <span class="material-icons title-icon">route</span>
+        <div class="title-details">
+          <h2>Lộ trình học tập cá nhân hóa</h2>
+          <p>{{ roadmap.description }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overview Meta Metrics -->
+    <div class="roadmap-meta-grid">
+      <div class="meta-item">
+        <span class="material-icons meta-icon text-success">flag</span>
+        <div class="meta-info">
+          <span class="meta-label">Chặng học</span>
+          <span class="meta-value">{{ levelResult }} → {{ targetLevel }}</span>
+        </div>
+      </div>
+
+      <div class="meta-item">
+        <span class="material-icons meta-icon text-primary">work</span>
+        <div class="meta-info">
+          <span class="meta-label">Chuyên ngành</span>
+          <span class="meta-value">{{ industryTrack }}</span>
+        </div>
+      </div>
+
+      <div class="meta-item">
+        <span class="material-icons meta-icon text-warning">alarm</span>
+        <div class="meta-info">
+          <span class="meta-label">Cam kết thời gian</span>
+          <span class="meta-value">{{ dailyGoalMinutes }} phút/ngày</span>
+        </div>
+      </div>
+
+      <div class="meta-item">
+        <span class="material-icons meta-icon text-info">calendar_today</span>
+        <div class="meta-info">
+          <span class="meta-label">Tổng thời gian</span>
+          <span class="meta-value">{{ roadmap.totalWeeks }} tuần học</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Timeline Accordion List -->
+    <div class="roadmap-timeline">
+      @for (week of weeks; track week.week; let idx = $index) {
+        <div 
+          class="timeline-week-item glass-card"
+          [class.week-active]="activeWeekIndex() === idx"
+        >
+          <div class="week-summary-row" (click)="toggleWeek(idx)">
+            <div class="week-left-group">
+              <span class="week-number-badge" [class.badge-completed]="idx < activeWeekIndex()">Tuần {{ week.week }}</span>
+              <div class="week-info">
+                <h3>{{ week.title }}</h3>
+                <span class="focus-label">Trọng tâm: {{ week.focus }}</span>
+              </div>
+            </div>
+            <span class="material-icons toggle-arrow-icon">
+              {{ activeWeekIndex() === idx ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}
+            </span>
+          </div>
+
+          <!-- Expanded detail tasks list -->
+          @if (activeWeekIndex() === idx) {
+            <div class="week-details-expanded animate-fade-in">
+              <p class="details-title">Danh sách mục tiêu và nhiệm vụ học tập cần hoàn thành:</p>
+              <div class="tasks-checklist">
+                @for (task of week.tasks; track task) {
+                  <div class="task-checkbox-item">
+                    <label class="task-checkbox-label">
+                      <input type="checkbox" class="task-checkbox" />
+                      <span class="task-text">{{ task }}</span>
+                    </label>
+                  </div>
+                }
+              </div>
+              
+              <div class="week-actions-panel">
+                <button class="btn btn-primary btn-sm study-now-btn" [routerLink]="['/learn']">
+                  Bắt đầu học ngay
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+}

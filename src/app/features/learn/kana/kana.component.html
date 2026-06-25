@@ -1,0 +1,133 @@
+<div class="kana-layout">
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1>Bảng Chữ Cái Kana</h1>
+    <p>Học bảng chữ cái Hiragana & Katakana tiếng Nhật bằng hoạt ảnh vẽ nét và so khớp nét vẽ Canvas thông minh.</p>
+    
+    <div class="overall-progress">
+      <div class="progress-info">
+        <span>Tiến độ Hiragana:</span>
+        <span class="score" [class.achieved]="hiraganaScore() >= 80">{{ hiraganaScore() }}%</span>
+      </div>
+      <div class="bar-bg">
+        <div class="bar-fill" [style.width.%]="hiraganaScore()"></div>
+      </div>
+      <span class="unlocked-note" *ngIf="hiraganaScore() >= 80">✅ Đã mở khóa Katakana!</span>
+      <span class="locked-note" *ngIf="hiraganaScore() < 80">🔒 Cần đạt >= 80% để mở khóa Katakana</span>
+    </div>
+  </div>
+
+  <!-- Tab Switcher -->
+  <div class="tab-switcher">
+    <button class="tab-btn" 
+            [class.active]="activeTab() === 'HIRAGANA'" 
+            (click)="switchTab('HIRAGANA')">
+      Hiragana (Mặt chữ mềm)
+    </button>
+    <button class="tab-btn tab-katakana" 
+            [class.active]="activeTab() === 'KATAKANA'" 
+            [class.tab-locked]="isKatakanaLocked()"
+            (click)="switchTab('KATAKANA')">
+      Katakana (Mặt chữ cứng)
+      <span class="badge-locked" *ngIf="isKatakanaLocked()">🔒 Khóa</span>
+    </button>
+  </div>
+
+  <!-- Grid Content -->
+  <div class="grid-content">
+    @for (row of groupedRows(); track row.rowName) {
+      <div class="row-container">
+        <div class="row-name">{{ row.rowName.toUpperCase() }}</div>
+        <div class="row-grid">
+          @for (char of row.characters; track char.id) {
+            <div class="char-card" (click)="openDetail(char)">
+              <div class="char-symbol">{{ char.character }}</div>
+              <div class="char-romaji">{{ char.romaji }}</div>
+              <div class="char-scores">
+                <div class="score-dot score-recognition" 
+                     [style.background-color]="getScoreColor(char.progress.recognitionScore)"
+                     title="Nhận diện: {{ char.progress.recognitionScore }}%"></div>
+                <div class="score-dot score-writing" 
+                     [style.background-color]="getScoreColor(char.progress.writingScore)"
+                     title="Viết nét: {{ char.progress.writingScore }}%"></div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Detail Modal / Drawer -->
+  @if (selectedChar()) {
+    <div class="modal-overlay" (click)="closeDetail()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <div class="header-left">
+            <span class="modal-title-char">{{ selectedChar()?.character }}</span>
+            <span class="modal-title-romaji">/{{ selectedChar()?.romaji }}/</span>
+            <button class="sound-play-btn" (click)="playSelectedAudio()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+              Nghe
+            </button>
+          </div>
+          <button class="close-btn" (click)="closeDetail()">&times;</button>
+        </div>
+
+        <!-- Practice Tabs -->
+        <div class="modal-tabs">
+          <button class="modal-tab-btn" 
+                  [class.active]="modalTab() === 'WRITE'" 
+                  (click)="modalTab.set('WRITE')">
+            Tập viết nét vẽ
+          </button>
+          <button class="modal-tab-btn" 
+                  [class.active]="modalTab() === 'QUIZ'" 
+                  (click)="modalTab.set('QUIZ')">
+            Luyện tập trắc nghiệm
+          </button>
+        </div>
+
+        <!-- Tab Contents -->
+        <div class="modal-body">
+          @if (modalTab() === 'WRITE') {
+            <div class="writing-layout">
+              <div class="panel">
+                <h4>Hướng dẫn thứ tự nét vẽ</h4>
+                <app-kana-stroke-animation [strokeSvgPath]="selectedChar()?.strokeSvgPath || null"></app-kana-stroke-animation>
+              </div>
+              
+              <div class="panel">
+                <h4>Luyện viết trên Canvas</h4>
+                <app-kana-writing-canvas 
+                  [strokeSvgPath]="selectedChar()?.strokeSvgPath || null"
+                  [isSubmitting]="isWritingSubmitting()"
+                  (submitDrawing)="onSubmitWriting($event)">
+                </app-kana-writing-canvas>
+
+                <!-- Score Result Overlay -->
+                @if (writingResult()) {
+                  <div class="writing-result-alert" [class.success]="writingResult()!.score >= 80">
+                    <span class="score-num">{{ writingResult()!.score }}%</span>
+                    <span class="score-text">
+                      {{ writingResult()!.score >= 80 ? 'Tuyệt vời! Bạn viết rất đẹp.' : 'Cố gắng lên! Hãy vẽ chính xác theo nét mẫu.' }}
+                    </span>
+                  </div>
+                }
+              </div>
+            </div>
+          } @else if (modalTab() === 'QUIZ') {
+            <div class="quiz-layout">
+              <app-kana-quiz 
+                [characters]="rawCharacters" 
+                [currentKana]="selectedChar()"
+                (close)="closeDetail()">
+              </app-kana-quiz>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>

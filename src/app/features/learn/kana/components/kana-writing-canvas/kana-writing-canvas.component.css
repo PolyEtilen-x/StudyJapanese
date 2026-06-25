@@ -1,0 +1,89 @@
+.canvas-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-light);
+  border-radius: 16px;
+  padding: 16px;
+  gap: 16px;
+  width: 100%;
+  max-width: 340px;
+}
+
+.canvas-wrapper {
+  position: relative;
+  background: var(--bg-surface);
+  border-radius: var(--radius-md);
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+  border: 1.5px solid rgba(255, 255, 255, 0.05);
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+}
+
+canvas {
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+  touch-action: none; /* Prevent default scrolling on mobile */
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+}
+
+.btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--bg-card);
+  color: var(--text-white);
+  border: 1px solid var(--border-medium);
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all var(--transition-fast);
+}
+
+.btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--color-indigo);
+}
+
+.btn-primary {
+  background: var(--color-indigo);
+  border-color: var(--color-indigo-hover);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--color-indigo-hover);
+}
+
+.btn-danger {
+  background: rgba(var(--color-red-rgb), 0.1);
+  border-color: rgba(var(--color-red-rgb), 0.3);
+  color: var(--color-red);
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: rgba(var(--color-red-rgb), 0.2);
+}
+
+.btn-active {
+  background: rgba(var(--color-indigo-rgb), 0.15);
+  border-color: var(--color-indigo);
+  color: var(--color-indigo-light);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

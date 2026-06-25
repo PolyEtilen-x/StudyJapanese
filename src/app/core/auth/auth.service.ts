@@ -18,6 +18,7 @@ export interface UserProfileData {
   totalXp?: number;
   credits: number;
   onboardingCompleted?: boolean;
+  roadmapJson?: any;
 }
 
 export interface UserProfile {

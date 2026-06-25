@@ -1,0 +1,278 @@
+<div class="onboarding-container animate-fade-in">
+  <!-- Progress Header -->
+  <header class="onboarding-header glass-card">
+    <div class="header-progress-info">
+      <span class="step-badge">Bước {{ currentStep() }} / 4</span>
+      <h2>
+        @if (currentStep() === 1) { Xác định mục tiêu }
+        @else if (currentStep() === 2) { Kiểm tra trình độ }
+        @else if (currentStep() === 3) { Chọn định hướng }
+        @else if (currentStep() === 4) { Cam kết học tập }
+      </h2>
+    </div>
+    <div class="progress-bar-track">
+      <div class="progress-bar-fill" [style.width.%]="progressPercentage()"></div>
+    </div>
+  </header>
+
+  <!-- Content Sections -->
+  <main class="onboarding-content">
+    @if (errorMessage()) {
+      <div class="error-banner">
+        <span class="material-icons">error</span>
+        <p>{{ errorMessage() }}</p>
+      </div>
+    }
+
+    <!-- STEP 1: LEARNING GOAL -->
+    @if (currentStep() === 1) {
+      <section class="step-section">
+        <p class="step-subtitle">Bạn muốn học tiếng Nhật để làm gì? Chúng tôi sẽ tối ưu hóa nội dung học tập dựa trên lựa chọn này.</p>
+        
+        <div class="cards-grid">
+          @for (goal of goals; track goal.value) {
+            <div 
+              class="goal-card glass-card" 
+              [class.active-card]="selectedGoal() === goal.value"
+              (click)="selectGoal(goal.value)"
+            >
+              <span class="material-icons goal-icon">{{ goal.icon }}</span>
+              <div class="card-details">
+                <h3>{{ goal.label }}</h3>
+                <p>{{ goal.desc }}</p>
+              </div>
+              <span class="material-icons select-indicator">
+                {{ selectedGoal() === goal.value ? 'check_circle' : 'radio_button_unchecked' }}
+              </span>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    <!-- STEP 2: PLACEMENT TEST OR SKIP -->
+    @if (currentStep() === 2) {
+      <section class="step-section">
+        <!-- Option Selector before starting -->
+        @if (!isTestingStarted() && !isSkipping() && !isTestingCompleted()) {
+          <p class="step-subtitle">Lựa chọn cách thức xác định trình độ tiếng Nhật xuất phát của bạn.</p>
+          
+          <div class="placement-options">
+            <div class="option-card glass-card highlight-option" (click)="startPlacementTest()">
+              <span class="material-icons option-icon">analytics</span>
+              <div class="option-details">
+                <h3>Bài thi Đánh giá thích ứng (IRT)</h3>
+                <p>Khuyên dùng. Thuật toán sẽ tự động điều chỉnh độ khó câu hỏi dựa trên đáp án của bạn để tìm ra trình độ JLPT chính xác nhất.</p>
+                <button class="btn btn-primary mt-4">Bắt đầu ngay</button>
+              </div>
+            </div>
+
+            <div class="option-card glass-card" (click)="isSkipping.set(true)">
+              <span class="material-icons option-icon">forward</span>
+              <div class="option-details">
+                <h3>Tự chọn trình độ bắt đầu</h3>
+                <p>Bỏ qua bài kiểm tra nếu bạn đã biết rõ trình độ JLPT của mình (từ N5 đến N1) để bắt đầu học ngay lập tức.</p>
+                <button class="btn btn-secondary mt-4">Tự chọn trình độ</button>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Manual Skipping / Level selection -->
+        @if (isSkipping() && !isTestingCompleted()) {
+          <div class="skip-level-container">
+            <button class="btn btn-secondary btn-sm mb-4" (click)="isSkipping.set(false); selectedSkipLevel.set('')">
+              <span class="material-icons">arrow_back</span> Quay lại chọn hình thức
+            </button>
+            <p class="step-subtitle">Chọn cấp độ JLPT mà bạn muốn bắt đầu học từ đầu:</p>
+
+            <div class="skip-grid">
+              @for (level of jlptLevels; track level.value) {
+                <div 
+                  class="level-card glass-card"
+                  [class.active-card]="selectedSkipLevel() === level.value"
+                  (click)="toggleSkipLevel(level.value)"
+                >
+                  <div class="level-badge" [class]="level.value.toLowerCase() + '-badge'">{{ level.label }}</div>
+                  <div class="card-details">
+                    <h3>Trình độ {{ level.label }}</h3>
+                    <p>{{ level.desc }}</p>
+                  </div>
+                </div>
+              }
+            </div>
+
+            @if (selectedSkipLevel()) {
+              <button 
+                class="btn btn-primary w-full mt-6" 
+                (click)="confirmSkipLevel()" 
+                [disabled]="isLoading()"
+              >
+                @if (isLoading()) { <span class="spinner"></span> Đang xử lý... }
+                @else { Xác nhận trình độ {{ selectedSkipLevel() }} & Tiếp tục }
+              </button>
+            }
+          </div>
+        }
+
+        <!-- Adaptive Test In Progress -->
+        @if (isTestingStarted() && !isTestingCompleted() && currentQuestion()) {
+          <div class="test-player-container glass-card">
+            <div class="test-progress-bar">
+              <div class="test-step-info">
+                <span>Câu hỏi {{ questionStepInfo().current }} / {{ questionStepInfo().total }}</span>
+                <span class="test-level-tag">Độ khó: {{ currentQuestion()!.level }}</span>
+              </div>
+              <div class="test-progress-track">
+                <div class="test-progress-fill" [style.width.%]="(questionStepInfo().current / questionStepInfo().total) * 100"></div>
+              </div>
+            </div>
+
+            <div class="question-content">
+              <p class="question-title">Chọn đáp án đúng nhất:</p>
+              <h3 class="jp-sentence">{{ currentQuestion()!.contentJp }}</h3>
+            </div>
+
+            <div class="options-list">
+              @for (opt of currentQuestion()!.options; track opt) {
+                <div 
+                  class="option-item"
+                  [class.selected-opt]="selectedOption() === opt"
+                  [class.correct-opt]="submitFeedback().show && opt === currentQuestion()!.options[0] && selectedOption() === opt"
+                  [class.incorrect-opt]="submitFeedback().show && selectedOption() === opt && !submitFeedback().isCorrect"
+                  (click)="selectOption(opt)"
+                >
+                  <span class="opt-label">{{ opt }}</span>
+                  @if (submitFeedback().show && opt === currentQuestion()!.options[0] && selectedOption() === opt) {
+                    <span class="material-icons feedback-icon text-success">check_circle</span>
+                  }
+                  @if (submitFeedback().show && selectedOption() === opt && !submitFeedback().isCorrect) {
+                    <span class="material-icons feedback-icon text-error">cancel</span>
+                  }
+                </div>
+              }
+            </div>
+
+            <div class="test-actions">
+              <button 
+                class="btn btn-secondary" 
+                (click)="isTestingStarted.set(false); isSkipping.set(true)"
+                [disabled]="isSubmittingAnswer()"
+              >
+                Dừng thi & Tự chọn level
+              </button>
+              
+              <button 
+                class="btn btn-primary"
+                [disabled]="!selectedOption() || submitFeedback().show || isSubmittingAnswer()"
+                (click)="submitAnswer()"
+              >
+                @if (isSubmittingAnswer()) { <span class="spinner"></span> Đang nộp... }
+                @else { Trả lời }
+              </button>
+            </div>
+          </div>
+        }
+
+        <!-- Test Completed Result screen -->
+        @if (isTestingCompleted() && testResult()) {
+          <div class="test-result-container glass-card text-center animate-fade-in">
+            <span class="material-icons success-crown-icon">workspace_premium</span>
+            <h2>Đánh giá thành công!</h2>
+            <p class="result-desc">Thuật toán phân tích năng lực đầu vào của bạn đạt mức:</p>
+            
+            <div class="result-level-box" [class]="testResult()!.estimatedLevel.toLowerCase() + '-active'">
+              {{ testResult()!.estimatedLevel }}
+            </div>
+
+            @if (testResult()!.confidenceScore > 0) {
+              <span class="confidence-badge">Độ tin cậy thuật toán: {{ (1 - testResult()!.confidenceScore) * 100 | number:'1.0-0' }}%</span>
+            }
+
+            <p class="result-detail mt-4">
+              Hệ thống sẽ tự động cấu hình Roadmap và tài liệu ôn tập theo chuẩn trình độ <strong>{{ testResult()!.estimatedLevel }}</strong>.
+            </p>
+          </div>
+        }
+      </section>
+    }
+
+    <!-- STEP 3: INDUSTRY TRACK -->
+    @if (currentStep() === 3) {
+      <section class="step-section">
+        <p class="step-subtitle">Bạn muốn tích hợp học tiếng Nhật chuyên ngành nào? Chúng tôi sẽ đan xen từ vựng chuyên ngành vào lộ trình học của bạn.</p>
+
+        <div class="cards-grid">
+          @for (track of tracks; track track.value) {
+            <div 
+              class="goal-card glass-card" 
+              [class.active-card]="selectedTrack() === track.value"
+              (click)="selectTrack(track.value)"
+            >
+              <span class="material-icons goal-icon">{{ track.icon }}</span>
+              <div class="card-details">
+                <h3>{{ track.label }}</h3>
+                <p>{{ track.desc }}</p>
+              </div>
+              <span class="material-icons select-indicator">
+                {{ selectedTrack() === track.value ? 'check_circle' : 'radio_button_unchecked' }}
+              </span>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    <!-- STEP 4: DAILY TIME COMMITMENT -->
+    @if (currentStep() === 4) {
+      <section class="step-section">
+        <p class="step-subtitle">Cam kết thời gian học mỗi ngày của bạn. Chúng tôi sẽ điều chỉnh mật độ công việc mỗi tuần trong lộ trình học cho phù hợp.</p>
+
+        <div class="commitments-container">
+          @for (c of commitments; track c.value) {
+            <div 
+              class="commitment-item glass-card"
+              [class.active-card]="selectedDailyMinutes() === c.value"
+              (click)="selectCommitment(c.value)"
+            >
+              <div class="commitment-left">
+                <span class="material-icons time-icon">alarm</span>
+                <div class="commitment-details">
+                  <h3>{{ c.label }}</h3>
+                  <p>{{ c.desc }}</p>
+                </div>
+              </div>
+              <span class="material-icons select-indicator">
+                {{ selectedDailyMinutes() === c.value ? 'check_circle' : 'radio_button_unchecked' }}
+              </span>
+            </div>
+          }
+        </div>
+      </section>
+    }
+  </main>
+
+  <!-- Footer Actions -->
+  <footer class="onboarding-footer glass-card">
+    <button 
+      class="btn btn-secondary back-btn-footer" 
+      [disabled]="currentStep() === 1 || isLoading() || (currentStep() === 2 && isTestingStarted())" 
+      (click)="prevStep()"
+    >
+      Quay lại
+    </button>
+
+    @if (currentStep() !== 2 || isTestingCompleted()) {
+      <button 
+        class="btn btn-primary next-btn-footer" 
+        [disabled]="isLoading() || (currentStep() === 1 && !selectedGoal()) || (currentStep() === 3 && !selectedTrack())"
+        (click)="nextStep()"
+      >
+        @if (isLoading()) { <span class="spinner"></span> Đang tạo lộ trình... }
+        @else {
+          {{ currentStep() === 4 ? 'Hoàn tất & Tạo Roadmap' : 'Tiếp tục' }}
+        }
+      </button>
+    }
+  </footer>
+</div>

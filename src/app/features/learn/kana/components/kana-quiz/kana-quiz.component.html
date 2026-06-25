@@ -1,0 +1,50 @@
+<div class="quiz-container">
+  @if (isFinished()) {
+    <div class="finish-card">
+      <div class="emoji">🎉</div>
+      <h3>Luyện tập hoàn tất!</h3>
+      <p>Bạn đã hoàn thành lượt ôn tập trắc nghiệm.</p>
+      <div class="score-display">
+        Trả lời đúng: <span class="highlight">{{ correctCount() }} / {{ totalQuestions }}</span>
+      </div>
+      <button class="btn btn-primary" (click)="onClose()">
+        Đóng
+      </button>
+    </div>
+  } @else {
+    <!-- Progress Bar -->
+    <div class="progress-header">
+      <span>Câu hỏi {{ currentIndex() + 1 }} / {{ totalQuestions }}</span>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" [style.width.%]="((currentIndex()) / totalQuestions) * 100"></div>
+      </div>
+    </div>
+
+    <!-- Question Body -->
+    <div class="question-body">
+      @if (currentQuestion().type === 'AUDIO_TO_CHAR') {
+        <p class="question-label">Nghe âm thanh và chọn chữ cái đúng:</p>
+        <button class="audio-btn" (click)="playAudio()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+          Nghe lại
+        </button>
+      } @else {
+        <p class="question-label">Chọn phát âm (Romaji) cho chữ cái sau:</p>
+        <div class="char-display">{{ currentQuestion().character.character }}</div>
+      }
+    </div>
+
+    <!-- Options Grid -->
+    <div class="options-grid">
+      @for (option of currentQuestion().options; track option) {
+        <button class="option-btn"
+                [disabled]="selectedOption() !== null"
+                [class.correct]="selectedOption() !== null && option === currentQuestion().correctAnswer"
+                [class.incorrect]="selectedOption() === option && option !== currentQuestion().correctAnswer"
+                (click)="selectOption(option)">
+          {{ option }}
+        </button>
+      }
+    </div>
+  }
+</div>

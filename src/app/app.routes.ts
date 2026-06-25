@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/auth/auth.guard';
+import { onboardingCompleteGuard, onboardingInProgressGuard } from './core/auth/onboarding-complete.guard';
 
 export const routes: Routes = [
   {
@@ -38,12 +39,20 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'onboarding',
+    loadComponent: () =>
+      import('./features/onboarding/onboarding.component').then(
+        (m) => m.OnboardingComponent
+      ),
+    canActivate: [authGuard, onboardingInProgressGuard],
+  },
+  {
     path: 'dashboard',
     loadComponent: () =>
       import('./features/dashboard/dashboard.component').then(
         (m) => m.DashboardComponent
       ),
-    canActivate: [authGuard],
+    canActivate: [authGuard, onboardingCompleteGuard],
   },
   {
     path: 'profile',
@@ -51,7 +60,7 @@ export const routes: Routes = [
       import('./features/user/pages/profile/profile.component').then(
         (m) => m.ProfileComponent
       ),
-    canActivate: [authGuard],
+    canActivate: [authGuard, onboardingCompleteGuard],
   },
   {
     path: 'settings',
@@ -59,7 +68,15 @@ export const routes: Routes = [
       import('./features/user/pages/settings/settings.component').then(
         (m) => m.SettingsComponent
       ),
-    canActivate: [authGuard],
+    canActivate: [authGuard, onboardingCompleteGuard],
+  },
+  {
+    path: 'learn/kana',
+    loadComponent: () =>
+      import('./features/learn/kana/kana.component').then(
+        (m) => m.KanaComponent
+      ),
+    canActivate: [authGuard, onboardingCompleteGuard],
   },
   {
     path: '',

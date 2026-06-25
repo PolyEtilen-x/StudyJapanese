@@ -3,11 +3,12 @@ import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
 import { useRequestVerificationMutation, useLogoutMutation } from '../auth/queries/auth.queries';
 import { UserStatusBadgeComponent } from '../user/components/user-status-badge/user-status-badge.component';
+import { RoadmapSummaryComponent } from '../user/components/roadmap-summary/roadmap-summary.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [UserStatusBadgeComponent, RouterLink],
+  imports: [UserStatusBadgeComponent, RoadmapSummaryComponent, RouterLink],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
