@@ -1,0 +1,18 @@
+<div class="user-status-badge-container">
+  @if (tier !== 'FREE') {
+    <div class="status-badge premium-badge" [class.premium-active]="tier === 'PREMIUM' || tier === 'ENTERPRISE'">
+      <span class="material-icons badge-icon">workspace_premium</span>
+      <span class="badge-label">{{ tier }}</span>
+    </div>
+  } @else {
+    <div class="status-badge free-badge">
+      <span class="material-icons badge-icon">account_circle</span>
+      <span class="badge-label">FREE</span>
+    </div>
+  }
+  
+  <div class="credits-badge" [routerLink]="['/profile']">
+    <span class="material-icons credits-icon">payments</span>
+    <span class="credits-count">{{ credits }} Credits</span>
+  </div>
+</div>

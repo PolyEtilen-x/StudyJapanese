@@ -1,0 +1,102 @@
+<div class="settings-page-container animate-fade-in">
+  <!-- Header Top Bar -->
+  <header class="settings-header glass-card">
+    <div class="header-left">
+      <button class="btn btn-secondary btn-sm back-btn" [routerLink]="['/dashboard']">
+        <span class="material-icons">arrow_back</span> Quay lại
+      </button>
+      <h1>Cài đặt học tập</h1>
+    </div>
+    <div class="header-right">
+      <app-user-status-badge></app-user-status-badge>
+    </div>
+  </header>
+
+  <!-- Form Container -->
+  <main class="settings-main glass-card">
+    <form [formGroup]="settingsForm" (ngSubmit)="onSubmit()" class="settings-form">
+      
+      <!-- Section 1: Learning Path Goals -->
+      <fieldset class="settings-section">
+        <legend class="section-title">Mục tiêu & Định hướng học tập</legend>
+        
+        <div class="form-group">
+          <label class="form-label" for="dailyGoal">Mục tiêu luyện tập hàng ngày</label>
+          <select id="dailyGoal" formControlName="dailyGoalMinutes" class="form-input">
+            @for (goal of goalsList; track goal.value) {
+              <option [value]="goal.value">{{ goal.label }}</option>
+            }
+          </select>
+          <p class="field-desc">Thiết lập thời gian tự học tối thiểu mỗi ngày của bạn. Hệ thống sẽ tính Streak dựa trên mục tiêu này.</p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="learningGoal">Mục đích chính của việc học</label>
+          <select id="learningGoal" formControlName="learningGoal" class="form-input">
+            @for (goal of learningGoals; track goal.value) {
+              <option [value]="goal.value">{{ goal.label }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="targetLevel">Trình độ JLPT mục tiêu</label>
+          <select id="targetLevel" formControlName="targetLevel" class="form-input">
+            @for (level of jlptLevels; track level.value) {
+              <option [value]="level.value">{{ level.label }}</option>
+            }
+          </select>
+        </div>
+      </fieldset>
+
+      <div class="section-divider"></div>
+
+      <!-- Section 2: Industry Track Gating -->
+      <fieldset class="settings-section">
+        <legend class="section-title">Định hướng chuyên ngành (Profession Track)</legend>
+        
+        <div class="form-group">
+          <label class="form-label" for="industryTrack">Nhóm ngành nghề tiếng Nhật chuyên sâu</label>
+          <select id="industryTrack" formControlName="industryTrack" class="form-input">
+            @for (track of industryTracks; track track.value) {
+              <option [value]="track.value">{{ track.label }}</option>
+            }
+          </select>
+          <p class="field-desc">Chọn ngành nghề bạn đang làm việc hoặc định hướng ứng tuyển. Tài liệu đọc hiểu, từ vựng và kịch bản Shadowing của bạn sẽ được ưu tiên theo ngành nghề này.</p>
+        </div>
+      </fieldset>
+
+      <div class="section-divider"></div>
+
+      <!-- Submit Section -->
+      <div class="form-footer">
+        @if (saveSuccess) {
+          <div class="alert-banner alert-success m-0-auto animate-fade-in">
+            <span class="material-icons alert-icon">check_circle</span>
+            <span>Lưu các thiết lập thành công!</span>
+          </div>
+        }
+        
+        @if (updateProfileMutation.error() || updateIndustryTrackMutation.error()) {
+          <div class="alert-banner alert-error m-0-auto animate-fade-in">
+            <span class="material-icons alert-icon">error</span>
+            <span>Có lỗi hệ thống xảy ra khi lưu cài đặt. Vui lòng thử lại.</span>
+          </div>
+        }
+
+        <button 
+          type="submit" 
+          class="btn btn-primary btn-save" 
+          [disabled]="settingsForm.invalid || updateProfileMutation.isPending() || updateIndustryTrackMutation.isPending()"
+        >
+          @if (updateProfileMutation.isPending() || updateIndustryTrackMutation.isPending()) {
+            <span class="spinner"></span> Đang lưu...
+          } @else {
+            <span class="material-icons">save</span> Lưu thay đổi
+          }
+        </button>
+      </div>
+
+    </form>
+  </main>
+</div>

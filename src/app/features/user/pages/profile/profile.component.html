@@ -1,0 +1,195 @@
+<div class="profile-page-container animate-fade-in">
+  <!-- Header Top Bar -->
+  <header class="profile-header glass-card">
+    <div class="header-left">
+      <button class="btn btn-secondary btn-sm back-btn" [routerLink]="['/dashboard']">
+        <span class="material-icons">arrow_back</span> Quay lại
+      </button>
+      <h1>Hồ sơ học viên</h1>
+    </div>
+    <div class="header-right">
+      <app-user-status-badge></app-user-status-badge>
+    </div>
+  </header>
+
+  <!-- Content Layout Grid -->
+  <div class="profile-grid">
+    <!-- Left Column: Personal Information & Form -->
+    <section class="profile-card glass-card">
+      <div class="avatar-section">
+        <img 
+          [src]="authService.currentUser()?.profile?.avatarUrl || 'assets/images/default-avatar.png'" 
+          alt="Avatar" 
+          class="user-avatar"
+          (error)="$event.target.src = 'https://api.dicebear.com/7.x/bottts/svg?seed=' + (authService.currentUser()?.email || 'default')"
+        />
+        <h2 class="user-display-name">
+          {{ authService.currentUser()?.profile?.displayName || 'Học viên' }}
+        </h2>
+        <span class="user-email">{{ authService.currentUser()?.email }}</span>
+      </div>
+
+      <div class="divider"></div>
+
+      @if (!isEditMode) {
+        <div class="info-display">
+          <div class="detail-item">
+            <span class="detail-label">Tên hiển thị</span>
+            <span class="detail-val">{{ authService.currentUser()?.profile?.displayName || 'Chưa thiết lập' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Ảnh đại diện (URL)</span>
+            <span class="detail-val truncate">{{ authService.currentUser()?.profile?.avatarUrl || 'Mặc định' }}</span>
+          </div>
+          
+          <button (click)="toggleEditMode()" class="btn btn-primary w-full mt-4">
+            <span class="material-icons">edit</span> Chỉnh sửa hồ sơ
+          </button>
+        </div>
+      } @else {
+        <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="profile-form">
+          <div class="form-group">
+            <label class="form-label" for="displayName">Tên hiển thị</label>
+            <input 
+              type="text" 
+              id="displayName" 
+              formControlName="displayName" 
+              class="form-input"
+              [class.input-error]="displayNameErrors"
+              placeholder="Nhập tên hiển thị..."
+            />
+            @if (displayNameErrors) {
+              <span class="form-error">Tên hiển thị không được để trống và tối đa 100 ký tự</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="avatarUrl">Ảnh đại diện (URL)</label>
+            <input 
+              type="text" 
+              id="avatarUrl" 
+              formControlName="avatarUrl" 
+              class="form-input"
+              [class.input-error]="avatarUrlErrors"
+              placeholder="https://images.unsplash.com/..."
+            />
+            @if (avatarUrlErrors) {
+              <span class="form-error">URL hình ảnh không hợp lệ</span>
+            }
+          </div>
+
+          @if (updateProfileMutation.error()) {
+            <span class="form-error error-banner">Có lỗi xảy ra khi lưu thay đổi</span>
+          }
+
+          <div class="form-actions">
+            <button type="button" (click)="toggleEditMode()" class="btn btn-secondary w-half">
+              Hủy
+            </button>
+            <button type="submit" class="btn btn-primary w-half" [disabled]="profileForm.invalid || updateProfileMutation.isPending()">
+              @if (updateProfileMutation.isPending()) {
+                <span class="spinner"></span> Đang lưu...
+              } @else {
+                Lưu
+              }
+            </button>
+          </div>
+        </form>
+      }
+    </section>
+
+    <!-- Right Column: Stats & Logs -->
+    <div class="stats-column-group">
+      <!-- Stats Summary Card -->
+      <section class="stats-card glass-card">
+        <h2>Tiến độ học tập</h2>
+        
+        @if (statsQuery.isPending()) {
+          <div class="loader-container">
+            <span class="spinner"></span> Đang tải số liệu...
+          </div>
+        } @else if (statsQuery.isError()) {
+          <div class="error-banner">Không thể tải số liệu thống kê. Vui lòng tải lại trang.</div>
+        } @else if (statsQuery.data()) {
+          @let stats = statsQuery.data()!;
+          <div class="stats-overview-grid">
+            <div class="overview-item">
+              <span class="material-icons overview-icon xp-icon">military_tech</span>
+              <div class="overview-details">
+                <span class="overview-val">{{ stats.totalXp }} XP</span>
+                <span class="overview-label">Tổng kinh nghiệm</span>
+              </div>
+            </div>
+            
+            <div class="overview-item">
+              <span class="material-icons overview-icon streak-icon">local_fire_department</span>
+              <div class="overview-details">
+                <span class="overview-val">{{ stats.streakCount }} Ngày</span>
+                <span class="overview-label">Streak hiện tại (Kỷ lục: {{ stats.longestStreak }})</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="progress-details-grid">
+            <div class="prog-item">
+              <span class="prog-label">Bảng chữ cái Kana</span>
+              <strong class="prog-val">{{ stats.progress.kanaLearned }} / 92</strong>
+              <div class="prog-bar-container">
+                <div class="prog-bar-fill" [style.width.%]="(stats.progress.kanaLearned / 92) * 100"></div>
+              </div>
+            </div>
+
+            <div class="prog-item">
+              <span class="prog-label">Chữ Kanji</span>
+              <strong class="prog-val">{{ stats.progress.kanjiLearned }} Ký tự</strong>
+              <div class="prog-bar-container">
+                <div class="prog-bar-fill kanji-fill" [style.width.%]="(stats.progress.kanjiLearned / 100) * 100"></div>
+              </div>
+            </div>
+
+            <div class="prog-item">
+              <span class="prog-label">Ngữ pháp đã học</span>
+              <strong class="prog-val">{{ stats.progress.grammarLearned }} Bài</strong>
+              <div class="prog-bar-container">
+                <div class="prog-bar-fill grammar-fill" [style.width.%]="(stats.progress.grammarLearned / 50) * 100"></div>
+              </div>
+            </div>
+          </div>
+        }
+      </section>
+
+      <!-- Recent XP Activities logs -->
+      <section class="logs-card glass-card">
+        <h2>Lịch sử hoạt động mới đây</h2>
+        
+        @if (statsQuery.isPending()) {
+          <div class="loader-container">
+            <span class="spinner"></span> Đang tải...
+          </div>
+        } @else if (statsQuery.data() && statsQuery.data()!.xpLogs.length > 0) {
+          <div class="xp-logs-list">
+            @for (log of statsQuery.data()!.xpLogs; track log.id) {
+              <div class="xp-log-item">
+                <div class="log-left">
+                  <span class="material-icons log-type-icon">stars</span>
+                  <div class="log-info">
+                    <span class="log-source">Học {{ log.sourceType }}</span>
+                    <span class="log-time">{{ log.createdAt | date:'HH:mm dd/MM/yyyy' }}</span>
+                  </div>
+                </div>
+                <div class="log-right">
+                  <span class="xp-gain">+{{ log.xpAmount }} XP</span>
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="empty-state">
+            <span class="material-icons empty-icon">history</span>
+            <p>Chưa có lịch sử hoạt động học tập nào.</p>
+          </div>
+        }
+      </section>
+    </div>
+  </div>
+</div>

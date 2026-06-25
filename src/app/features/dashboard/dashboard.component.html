@@ -5,13 +5,22 @@
       <span class="icon logo-icon">menu_book</span>
       <span class="brand-name">StudyJapanese</span>
     </div>
-    <div class="nav-user">
-      <span class="user-greeting">Chào, <strong>{{ authService.currentUser()?.profile?.displayName || 'Học viên' }}</strong></span>
+    <div class="nav-user animate-fade-in">
+      <app-user-status-badge></app-user-status-badge>
+      
+      <button [routerLink]="['/profile']" class="btn btn-secondary btn-sm">
+        <span class="material-icons">account_circle</span> Hồ sơ
+      </button>
+      
+      <button [routerLink]="['/settings']" class="btn btn-secondary btn-sm">
+        <span class="material-icons">settings</span> Cài đặt
+      </button>
+
       <button (click)="onLogout()" class="btn btn-secondary btn-sm" [disabled]="logoutMutation.isPending()">
         @if (logoutMutation.isPending()) {
           <span class="spinner btn-spinner"></span>
         } @else {
-          <span class="icon">logout</span> Đăng xuất
+          <span class="material-icons">logout</span> Đăng xuất
         }
       </button>
     </div>

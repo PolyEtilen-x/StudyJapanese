@@ -1,0 +1,8 @@
+<div class="ui-checkbox-container" (click)="onToggle()" [class.ui-checkbox-disabled]="disabled()">
+  <div class="ui-checkbox-box" [class.ui-checkbox-checked]="checked()">
+    <svg *ngIf="checked()" viewBox="0 0 24 24" class="ui-checkbox-icon">
+      <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+    </svg>
+  </div>
+  <span *ngIf="label()" class="ui-checkbox-label">{{ label() }}</span>
+</div>

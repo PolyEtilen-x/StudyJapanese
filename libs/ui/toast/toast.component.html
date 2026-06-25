@@ -1,0 +1,6 @@
+<div [class]="'ui-toast ui-toast-' + variant()">
+  <div class="ui-toast-content">
+    <ng-content></ng-content>
+  </div>
+  <button class="ui-toast-close" (click)="close.emit()">&times;</button>
+</div>

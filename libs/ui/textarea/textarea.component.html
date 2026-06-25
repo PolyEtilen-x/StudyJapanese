@@ -1,0 +1,13 @@
+<div class="ui-textarea-group">
+  <label *ngIf="label()" class="ui-textarea-label">{{ label() }}</label>
+  <textarea
+    [placeholder]="placeholder()"
+    [value]="value()"
+    [rows]="rows()"
+    [disabled]="disabled()"
+    [class.ui-textarea-error]="error()"
+    class="ui-form-textarea"
+    (input)="onValueChange($event)"
+  ></textarea>
+  <span *ngIf="error()" class="ui-textarea-error-msg">{{ error() }}</span>
+</div>

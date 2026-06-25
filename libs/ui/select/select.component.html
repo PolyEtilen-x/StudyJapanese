@@ -1,0 +1,11 @@
+<div class="ui-select-group">
+  <label *ngIf="label()" class="ui-select-label">{{ label() }}</label>
+  <select
+    [value]="value()"
+    [disabled]="disabled()"
+    class="ui-form-select"
+    (change)="onSelectChange($event)"
+  >
+    <option *ngFor="let opt of options()" [value]="opt.value">{{ opt.label }}</option>
+  </select>
+</div>

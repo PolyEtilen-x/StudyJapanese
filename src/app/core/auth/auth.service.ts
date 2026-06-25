@@ -7,7 +7,17 @@ import { tap, catchError, map, switchMap } from 'rxjs/operators';
 
 export interface UserProfileData {
   displayName?: string;
+  avatarUrl?: string;
+  levelResult?: string;
+  industryTrack?: string;
+  dailyGoalMinutes?: number;
+  learningGoal?: string;
+  targetLevel?: string;
+  streakCount?: number;
+  longestStreak?: number;
+  totalXp?: number;
   credits: number;
+  onboardingCompleted?: boolean;
 }
 
 export interface UserProfile {

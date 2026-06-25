@@ -1,11 +1,13 @@
 import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
 import { useRequestVerificationMutation, useLogoutMutation } from '../auth/queries/auth.queries';
+import { UserStatusBadgeComponent } from '../user/components/user-status-badge/user-status-badge.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [],
+  imports: [UserStatusBadgeComponent, RouterLink],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush

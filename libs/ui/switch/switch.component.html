@@ -1,0 +1,6 @@
+<div class="ui-switch-container" (click)="onToggle()" [class.ui-switch-disabled]="disabled()">
+  <div class="ui-switch-track" [class.ui-switch-checked]="checked()">
+    <div class="ui-switch-thumb" [class.ui-switch-thumb-checked]="checked()"></div>
+  </div>
+  <span *ngIf="label()" class="ui-switch-label">{{ label() }}</span>
+</div>
